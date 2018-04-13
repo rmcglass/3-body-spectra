@@ -25,3 +25,7 @@ def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
     accelcona=accel(posa,posc,mc)
     totalaccel=accelbona+accelcona
     return vprev+totalaccel*timestep
+
+
+def xNew(dfg)
+    return
