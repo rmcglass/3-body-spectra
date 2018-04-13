@@ -15,7 +15,10 @@ vi_3 = np.array([0,0,50])
 pos1 = np.array([10,0,0])
 pos2 = np.array([0,10,0])
 pos3 = np.array([0,0,10])
-#initial positions
+#position arrays
+posArray1 = []
+posArray2=[]
+posArray3=[]
 
 def accel(posa,posb,mb):
     #returns the acceleration of particle a caused by its gravitational interaction with particle b
@@ -55,8 +58,12 @@ for t in np.arange(0,100,0.1):
     x1updated = posNew(pos1,dt,velupdated1)
     x2updated = posNew(pos2,dt,velupdated2)
     x3updated = posNew(pos3,dt,velupdated3)
-    print x1updated
+    posArray1.append(x1updated)
+    posArray2.append(x2updated)
+    posArray3.append(x3updated)
+    print(x1updated)
 
 from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
 ax=fig.add_subplot(111,projection='3d')
+plt.show(fig)
