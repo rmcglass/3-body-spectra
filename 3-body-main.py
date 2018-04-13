@@ -15,7 +15,13 @@ posi_1 = [100,0,0]
 posi_2 = [0,100,0]
 posi_3 = [0,0,100]
 #initial positions
-def accel(posa,posb,ma):
-    #returns the acceleration of particle b caused by its gravitational interaction with particle a
-    return -G*ma/np.abs(posa-posb)
+def accel(posa,posb,mb):
+    #returns the acceleration of particle a caused by its gravitational interaction with particle b
+    return -G*mb/np.abs(posa-posb)
 
+def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
+    #returns the updated velocity of particle a based on the gravitational interaction with particles b and c.
+    accelbona=accel(posa,posb,mb)
+    accelcona=accel(posa,posc,mc)
+    totalaccel=accelbona+accelcona
+    return vprev+totalaccel*timestep
