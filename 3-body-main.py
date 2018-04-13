@@ -1,7 +1,7 @@
 import numpy as np
 ##### initialize variables
 maxTime = 50
-G = 1
+G=1
 # make masses
 m_1 = 10
 m_2 = 10
@@ -26,6 +26,6 @@ def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
     totalaccel=accelbona+accelcona
     return vprev+totalaccel*timestep
 
-
-def xNew(dfg)
-    return
+def posNew(pos, dt, Vn1half):
+    return pos + dt*Vn1half
+def Vn3half():
