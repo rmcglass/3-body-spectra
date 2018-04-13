@@ -13,4 +13,5 @@ posi_1 = [100,0,0]
 posi_2 = [0,100,0]
 posi_3 = [0,0,100]
 
-
+def xNew(dfg)
+    return
