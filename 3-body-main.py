@@ -1,5 +1,7 @@
+import numpy as np
 ##### initialize variables
 maxTime = 50
+G = 1
 # make masses
 m_1 = 10
 m_2 = 10
@@ -12,5 +14,8 @@ vi_3 = [0,0,50]
 posi_1 = [100,0,0]
 posi_2 = [0,100,0]
 posi_3 = [0,0,100]
-
+#initial positions
+def accel(posa,posb,ma):
+    #returns the acceleration of particle b caused by its gravitational interaction with particle a
+    return -G*ma/np.abs(posa-posb)
 
