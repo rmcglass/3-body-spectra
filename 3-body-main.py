@@ -28,6 +28,13 @@ def accel(posa,posb,mb):
     accel = G*mb*normvec/(np.linalg.norm(posa-posb)**2.0)
     return accel
 
+def computeEnergy(vel1,vel2,vel3,pos1,pos2,pos3):
+    #we can use this function to make sure that our numerical solution conserves energy.
+    kineticterm = 0.5*(m_1*np.linalg.norm(vel1)**2 + m_2*np.linalg.norm(vel2)**2 + m_3*np.linalg.norm(vel3)**2)
+    potentialterm = -2*G*(m_1*m_2/np.linalg.norm(pos1-pos2)+m_1*m_3/np.linalg.norm(pos1-pos3)+m_2*m_3/np.linalg.norm(pos2-pos3))
+    energy = potentialterm + kineticterm
+    return energy
+
 #initial half-step velocity
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2)+accel(pos1,pos3,m_3))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_2)+accel(pos2,pos3,m_3))
@@ -36,11 +43,8 @@ v05_3 = vi_3+0.05*(accel(pos3,pos1,m_2)+accel(pos3,pos2,m_3))
 def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
     #returns the updated velocity of particle a based on the gravitational interaction with particles b and c.
     accelbona=accel(posa,posb,mb)
-    #print 'accelbona',accelbona
     accelcona=accel(posa,posc,mc)
-    #print 'accelcona',accelcona
     totalaccel=accelbona+accelcona
-    #print 'totalaccel',totalaccel
     velhalf = vprev+totalaccel*timestep
     return velhalf
 
@@ -54,7 +58,8 @@ x1updated=pos1
 x2updated=pos2
 x3updated=pos3
 
-print(x1updated)
+energyvals=[]
+
 for t in np.arange(0,maxTime,0.1):
     dt = 0.1
     if t == 0:
@@ -62,12 +67,11 @@ for t in np.arange(0,maxTime,0.1):
         velupdated2 = velHalfStep(v05_2,dt,pos2,pos3,pos1,m_3,m_1)
         velupdated3 = velHalfStep(v05_3,dt,pos3,pos1,pos2,m_1,m_2)
     else:
-        #print 'vel1s accel'
         velupdated1 = velHalfStep(velupdated1,dt,x1updated,x2updated,x3updated,m_2,m_3)
-        #print 'vel2s accel'
         velupdated2 = velHalfStep(velupdated2,dt,x2updated,x3updated,x1updated,m_3,m_1)
-        #print 'vel3s accel'
         velupdated3 = velHalfStep(velupdated3,dt,x3updated,x1updated,x2updated,m_1,m_2)
+    updatedenergy = computeEnergy(velupdated1, velupdated2, velupdated3, x1updated, x2updated, x3updated)
+    energyvals.append(updatedenergy)
     x1updated = posNew(x1updated,dt,velupdated1)
     x2updated = posNew(x2updated,dt,velupdated2)
     x3updated = posNew(x3updated,dt,velupdated3)
@@ -96,4 +100,7 @@ plt.plot(arrayforplots3[0],arrayforplots3[1])
 #ax.plot(arrayforplots2[0],arrayforplots2[1],arrayforplots2[2])
 #ax.plot(arrayforplots3[0],arrayforplots3[1],arrayforplots3[2])
 
+plt.show()
+
+plt.plot(np.arange(0,maxTime,0.1),energyvals)
 plt.show()
