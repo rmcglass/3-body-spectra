@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 ##### initialize variables
-maxTime = 15
+maxTime = 30
 G=1
 # make masses
 m_1 = 1
@@ -35,6 +35,7 @@ def computeEnergy(vel1,vel2,vel3,pos1,pos2,pos3):
     energy = potentialterm + kineticterm
     return energy
 
+
 #initial half-step velocity
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2)+accel(pos1,pos3,m_3))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_2)+accel(pos2,pos3,m_3))
@@ -61,11 +62,15 @@ x3updated=pos3
 energyvals=[]
 
 for t in np.arange(0,maxTime,0.1):
-    dt = 0.1
+    dt = .1
     if t == 0:
         velupdated1 = velHalfStep(v05_1,dt,pos1,pos2,pos3,m_2,m_3)
         velupdated2 = velHalfStep(v05_2,dt,pos2,pos3,pos1,m_3,m_1)
         velupdated3 = velHalfStep(v05_3,dt,pos3,pos1,pos2,m_1,m_2)
+    # if t == 0:
+    #     velupdated1 = vi_1
+    #     velupdated2 = vi_2
+    #     velupdated3 = vi_3
     else:
         velupdated1 = velHalfStep(velupdated1,dt,x1updated,x2updated,x3updated,m_2,m_3)
         velupdated2 = velHalfStep(velupdated2,dt,x2updated,x3updated,x1updated,m_3,m_1)
