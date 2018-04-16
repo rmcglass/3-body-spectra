@@ -1,20 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
 ##### initialize variables
-maxTime = 50
+maxTime = 15
 G=1
 # make masses
-m_1 = 10
+m_1 = 1
 m_2 = 1
-m_3 = 100
+m_3 = 1
 #initial velocity vectors
-vi_1 = np.array([0,-1.0,0])
-vi_2 = np.array([1.0,0,0])
-vi_3 = np.array([0,1.0,0])
+p1 = 0.51394
+p2 = 0.30474
+vi_1 = np.array([p1,p2])
+vi_2 = np.array([p1,p2])
+vi_3 = np.array([-2*p1,-2*p2])
 #intitial positions
-pos1 = np.array([5.0,0,0])
-pos2 = np.array([0,-20.0,0])
-pos3 = np.array([0,0,0])
+pos1 = np.array([-1.0,0.0])
+pos2 = np.array([1.0,0.0])
+pos3 = np.array([0.0,0.0])
 #position arrays
 posArray1 = []
 posArray2=[]
@@ -52,8 +54,8 @@ x1updated=pos1
 x2updated=pos2
 x3updated=pos3
 
-print x1updated
-for t in np.arange(0,100,0.1):
+print(x1updated)
+for t in np.arange(0,maxTime,0.1):
     dt = 0.1
     if t == 0:
         velupdated1 = velHalfStep(v05_1,dt,pos1,pos2,pos3,m_2,m_3)
