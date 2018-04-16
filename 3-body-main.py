@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 ##### initialize variables
 maxTime = 30
 G=1
+dt = .1
 # make masses
 m_1 = 1
 m_2 = 1
@@ -24,8 +26,12 @@ posArray3=[]
 
 def accel(posa,posb,mb):
     #returns the acceleration of particle a caused by its gravitational interaction with particle b
-    normvec = (posb - posa)/ np.linalg.norm(posa-posb)
-    accel = G*mb*normvec/(np.linalg.norm(posa-posb)**2.0)
+    vecmag = np.linalg.norm(posa-posb)
+    normvec = (posb - posa)/ vecmag
+    if vecmag < .05:
+        accel = 0
+    else:
+        accel = G*mb*normvec/(np.linalg.norm(posa-posb)**2.0)
     return accel
 
 def computeEnergy(vel1,vel2,vel3,pos1,pos2,pos3):
@@ -61,8 +67,7 @@ x3updated=pos3
 
 energyvals=[]
 
-for t in np.arange(0,maxTime,0.1):
-    dt = .1
+for t in np.arange(0,maxTime,dt):
     if t == 0:
         velupdated1 = velHalfStep(v05_1,dt,pos1,pos2,pos3,m_2,m_3)
         velupdated2 = velHalfStep(v05_2,dt,pos2,pos3,pos1,m_3,m_1)
@@ -71,6 +76,7 @@ for t in np.arange(0,maxTime,0.1):
     #     velupdated1 = vi_1
     #     velupdated2 = vi_2
     #     velupdated3 = vi_3
+
     else:
         velupdated1 = velHalfStep(velupdated1,dt,x1updated,x2updated,x3updated,m_2,m_3)
         velupdated2 = velHalfStep(velupdated2,dt,x2updated,x3updated,x1updated,m_3,m_1)
@@ -84,19 +90,45 @@ for t in np.arange(0,maxTime,0.1):
     posArray2.append(x2updated)
     posArray3.append(x3updated)
 
+# -----------------------------------------------------------------
+# -------------- PLOTS AND ANIMATIONS BELOW------------------------
+# -----------------------------------------------------------------
 
 from mpl_toolkits.mplot3d import Axes3D
-#fig = plt.figure()
-#ax=fig.add_subplot(111,projection='3d')
+fig = plt.figure()
+ax=fig.add_subplot(111)
+line1, = ax.plot([], [], 'o-', lw=2)
+line2, = ax.plot([], [], 'o-', lw=2)
+line3, = ax.plot([], [], 'o-', lw=2)
+
 #----the 3d plot methods require that we use an array for x values, an array for y values, and an array for z values-
 #this is the transpose of the arrays that we make in the loop above, so i just switch them around here.
+
 arrayforplots1= np.transpose(posArray1)
 arrayforplots2=np.transpose(posArray2)
 arrayforplots3=np.transpose(posArray3)
 
-plt.plot(arrayforplots1[0],arrayforplots1[1])
-plt.plot(arrayforplots2[0],arrayforplots2[1])
-plt.plot(arrayforplots3[0],arrayforplots3[1])
+# plt.plot(arrayforplots1[0],arrayforplots1[1])
+# plt.plot(arrayforplots2[0],arrayforplots2[1])
+# plt.plot(arrayforplots3[0],arrayforplots3[1])
+
+
+def plotInit():
+    '''set up animation with initial conditions'''
+    line1.set_data(arrayforplots1[0][0],arrayforplots1[1][0])
+    line2.set_data(arrayforplots2[0][0],arrayforplots2[1][0])
+    line3.set_data(arrayforplots3[0][0],arrayforplots3[1][0])
+    return line1, line2, line3
+
+def animate(i):
+    '''step animation'''
+    line1.set_data(arrayforplots1[0][i],arrayforplots1[1][i])
+    line2.set_data(arrayforplots2[0][i],arrayforplots2[1][i])
+    line3.set_data(arrayforplots3[0][i],arrayforplots3[1][i])
+    return line1, line2, line3
+
+ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, init_func=plotInit)
+
 
 #for the time being, we'll try and look at the 2d motion of our particles. this should be fine, because if they
 #have no initial z offset or velocity, we shouldnt have any motion or acceleration in that dimension
