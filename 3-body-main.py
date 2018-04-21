@@ -12,15 +12,16 @@ m_3 = 1
 #initial velocity vectors
 p1 = 0.51394
 p2 = 0.30474
-vi_1 = np.array([p1,p2])
-vi_2 = np.array([p1,p2])
-vi_3 = np.array([-2*p1,-2*p2])
+p3 = 0
+vi_1 = np.array([p1,p2,p3])
+vi_2 = np.array([p1,p2,p3])
+vi_3 = np.array([-2*p1,-2*p2,-2*p3])
 #intitial positions
-pos1 = np.array([-1.0,0.0])
-pos2 = np.array([1.0,0.0])
-pos3 = np.array([0.0,0.0])
+pos1 = np.array([-1.0,0.0,0.0])
+pos2 = np.array([1.0,0.0,0.0])
+pos3 = np.array([0.0,0.0,0.0])
 #position arrays
-posArray1 = []
+posArray1=[]
 posArray2=[]
 posArray3=[]
 
@@ -57,6 +58,9 @@ def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
 
 def posNew(pos,dt,velupdated):
     return pos + dt*velupdated
+
+def projectToLOS(vel,los):
+    return np.dot(vel,los)
 
 velupdated1 = 0.0
 velupdated2 = 0.0
@@ -96,10 +100,10 @@ for t in np.arange(0,maxTime,dt):
 
 from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
-ax=fig.add_subplot(111)
-line1, = ax.plot([], [], 'o-', lw=2)
-line2, = ax.plot([], [], 'o-', lw=2)
-line3, = ax.plot([], [], 'o-', lw=2)
+ax=fig.add_subplot(111,projection='3d')
+# line1, = ax.plot([], [], [], 'o-', lw=2)
+# line2, = ax.plot([], [], [], 'o-', lw=2)
+# line3, = ax.plot([], [], [], 'o-', lw=2)
 
 #----the 3d plot methods require that we use an array for x values, an array for y values, and an array for z values-
 #this is the transpose of the arrays that we make in the loop above, so i just switch them around here.
@@ -108,26 +112,26 @@ arrayforplots1= np.transpose(posArray1)
 arrayforplots2=np.transpose(posArray2)
 arrayforplots3=np.transpose(posArray3)
 
-# plt.plot(arrayforplots1[0],arrayforplots1[1])
-# plt.plot(arrayforplots2[0],arrayforplots2[1])
-# plt.plot(arrayforplots3[0],arrayforplots3[1])
+plt.plot(arrayforplots1[0],arrayforplots1[1],arrayforplots1[2])
+plt.plot(arrayforplots2[0],arrayforplots2[1],arrayforplots2[2])
+plt.plot(arrayforplots3[0],arrayforplots3[1],arrayforplots3[2])
 
 
-def plotInit():
-    '''set up animation with initial conditions'''
-    line1.set_data(arrayforplots1[0][0],arrayforplots1[1][0])
-    line2.set_data(arrayforplots2[0][0],arrayforplots2[1][0])
-    line3.set_data(arrayforplots3[0][0],arrayforplots3[1][0])
-    return line1, line2, line3
-
-def animate(i):
-    '''step animation'''
-    line1.set_data(arrayforplots1[0][i],arrayforplots1[1][i])
-    line2.set_data(arrayforplots2[0][i],arrayforplots2[1][i])
-    line3.set_data(arrayforplots3[0][i],arrayforplots3[1][i])
-    return line1, line2, line3
-
-ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, init_func=plotInit)
+# def plotInit():
+#     '''set up animation with initial conditions'''
+#     line1.set_data(arrayforplots1[0][0],arrayforplots1[1][0],arrayforplots1[2][0])
+#     line2.set_data(arrayforplots2[0][0],arrayforplots2[1][0],arrayforplots2[2][0])
+#     line3.set_data(arrayforplots3[0][0],arrayforplots3[1][0],arrayforplots3[2][0])
+#     return line1, line2, line3
+#
+# def animate(i):
+#     '''step animation'''
+#     line1.set_data(arrayforplots1[0][i],arrayforplots1[1][i],arrayforplots1[2][i])
+#     line2.set_data(arrayforplots2[0][i],arrayforplots2[1][i],arrayforplots2[2][i])
+#     line3.set_data(arrayforplots3[0][i],arrayforplots3[1][i],arrayforplots3[2][i])
+#     return line1, line2, line3
+#
+# ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, init_func=plotInit)
 
 
 #for the time being, we'll try and look at the 2d motion of our particles. this should be fine, because if they
@@ -139,5 +143,5 @@ ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, 
 
 plt.show()
 
-plt.plot(np.arange(0,maxTime,0.1),energyvals)
+plt.plot(np.arange(0,maxTime,dt),energyvals)
 plt.show()
