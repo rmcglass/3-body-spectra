@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 ##### initialize variables
-maxTime = 100000
+maxTime = 100
 G=1.0
-dt = 10
+dt = .1
 # make asses
 m_1 = 1
 m_2 = 1
@@ -112,6 +112,7 @@ x3updated=pos3
 
 energyvals=[]
 def leapfrog(x1updated,x2updated,x3updated,losvec):
+
     # i wanted this as a function, not as a little few lines of code so i can call it a whole bunch of times
     for t in np.arange(0,maxTime,dt):
         if t == 0:
