@@ -222,7 +222,7 @@ plt.plot(np.arange(0,maxTime,dt),losVelArray2,label='less massive obj')
 plt.plot(np.arange(0,maxTime,dt),losVelArray3,label='tiny obj')
 plt.legend()
 
-#plt.show()
+plt.show()
 from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
 ax=fig.add_subplot(111, projection='3d')
