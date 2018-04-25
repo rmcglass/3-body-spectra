@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 ##### initialize variables
-maxTime = 1000
+maxTime = 100
 G=1.0
 dt = 0.1
 # make asses
@@ -185,7 +185,7 @@ arrayforprojplots3 = np.transpose(projPosArray3)
 #we'll want to think about the restricted 3-body problem. in this case, we have two masses that are very, very massive - they will have stable orbits.
 #first, i'm going to test this - well try to do a two body version of our code!
 dt=10
-maxTime=1000
+maxTime=100000
 
 m_1=1000.0
 m_2=1.0
