@@ -291,12 +291,17 @@ plt.show()
 #(we'll plot this in log space, i guess)
 
 def gaussianprofile(velpos,centvel,maxflux,width):
+    #creates a gaussianprofile for each
     #Set the normalisation
     norm = maxflux/(width*np.sqrt(2.*np.pi))
     return norm*np.exp(-((velpos-centvel)**2.) / (2.*width**2.))
 
-velvals=np.arange(0,500,1.0)
-plt.plot(velvals,gaussianprofile(velvals,20.0,1.0,5.0))
-plt.show()
+def createSumGauss(velpos, cvels,fluxes,widths):
+    #this method creates the triple gaussian profile of all three lines
+    centvel1,centvel2,centvel3 = cvels
+    flux1,flux2,flux3 = fluxes
+    width1,width2,width3 = widths
+    retvals=[gaussianprofile(v,centvel1,flux1,width1)+gaussianprofile(v,centvel2,flux2,width2)+gaussianprofile(v,centvel3,flux3,width3) for v in velpos]
+    return retvals
 # plt.plot(np.arange(0,maxTime,0.1),energyvals)
 # plt.show()
