@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from mpl_toolkits import mplot3d
 ##### initialize variables
 maxTime = 30
 G=1
@@ -20,10 +21,12 @@ pos1 = np.array([-1.0,0.0])
 pos2 = np.array([1.0,0.0])
 pos3 = np.array([0.0,0.0])
 #position arrays
-posArray1 = []
+posArray1=[]
 posArray2=[]
 posArray3=[]
-
+projPosArray1=[]
+projPosArray2=[]
+projPosArray3=[]
 def accel(posa,posb,mb):
     #returns the acceleration of particle a caused by its gravitational interaction with particle b
     vecmag = np.linalg.norm(posa-posb)
@@ -55,8 +58,28 @@ def velHalfStep(vprev,timestep,posa,posb,posc,mb,mc):
     velhalf = vprev+totalaccel*timestep
     return velhalf
 
+
 def posNew(pos,dt,velupdated):
     return pos + dt*velupdated
+
+# projects 2D coords onto 3D sphere w/ fixed radius
+def projPos():
+    for i in range(0,len(posArray1)-1):
+        oldX = posArray1[i][0]
+        oldY = posArray1[i][1]
+        newPos1 = np.array([2*oldX/(1+oldX**2+oldY**2),2*oldY/(1+oldX**2+oldY**2),(-1+oldX**2+oldY**2)/(1+oldX**2+oldY**2)])
+        projPosArray1.append(newPos1)
+    for i in range(0,len(posArray2)-1):
+        oldX = posArray2[i][0]
+        oldY = posArray2[i][1]
+        newPos2 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),(-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
+        projPosArray1.append(newPos2)
+    for i in range(0,len(posArray3)-1):
+        oldX = posArray3[i][0]
+        oldY = posArray3[i][1]
+        newPos3 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),
+                            (-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
+        projPosArray1.append(newPos3)
 
 velupdated1 = 0.0
 velupdated2 = 0.0
@@ -94,9 +117,10 @@ for t in np.arange(0,maxTime,dt):
 # -------------- PLOTS AND ANIMATIONS BELOW------------------------
 # -----------------------------------------------------------------
 
-from mpl_toolkits.mplot3d import Axes3D
+
 fig = plt.figure()
 ax=fig.add_subplot(111)
+ax2 = plt.axes(projection='3d')
 line1, = ax.plot([], [], 'o-', lw=2)
 line2, = ax.plot([], [], 'o-', lw=2)
 line3, = ax.plot([], [], 'o-', lw=2)
@@ -108,9 +132,15 @@ arrayforplots1= np.transpose(posArray1)
 arrayforplots2=np.transpose(posArray2)
 arrayforplots3=np.transpose(posArray3)
 
-# plt.plot(arrayforplots1[0],arrayforplots1[1])
-# plt.plot(arrayforplots2[0],arrayforplots2[1])
-# plt.plot(arrayforplots3[0],arrayforplots3[1])
+## make arrays suitable for projection
+projPos()
+arrayforprojplots1 = np.transpose(projPosArray1)
+arrayforprojplots2 = np.transpose(projPosArray2)
+arrayforprojplots3 = np.transpose(projPosArray3)
+
+plt.plot(arrayforplots1[0],arrayforplots1[1])
+plt.plot(arrayforplots2[0],arrayforplots2[1])
+plt.plot(arrayforplots3[0],arrayforplots3[1])
 
 
 def plotInit():
@@ -127,7 +157,7 @@ def animate(i):
     line3.set_data(arrayforplots3[0][i],arrayforplots3[1][i])
     return line1, line2, line3
 
-ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, init_func=plotInit)
+#ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, init_func=plotInit)
 
 
 #for the time being, we'll try and look at the 2d motion of our particles. this should be fine, because if they
@@ -140,4 +170,8 @@ ani = animation.FuncAnimation(fig, animate, frames =int(maxTime/dt), blit=True, 
 plt.show()
 
 plt.plot(np.arange(0,maxTime,0.1),energyvals)
+plt.show()
+ax2.plot3D(arrayforprojplots1[0],arrayforprojplots1[1])
+ax2.plot3D(arrayforprojplots2[0],arrayforprojplots2[1])
+ax2.plot3D(arrayforprojplots3[0],arrayforprojplots3[1])
 plt.show()
