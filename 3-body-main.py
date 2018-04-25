@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 ##### initialize variables
-maxTime = 1000
+maxTime = 100000
 G=1.0
-dt = 0.1
-# make masses
+dt = 10
+# make asses
 m_1 = 1
 m_2 = 1
 m_3 = 1
@@ -95,13 +95,13 @@ def projPos():
         oldX = posArray2[i][0]
         oldY = posArray2[i][1]
         newPos2 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),(-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
-        projPosArray1.append(newPos2)
+        projPosArray2.append(newPos2)
     for i in range(0,len(posArray3)-1):
         oldX = posArray3[i][0]
         oldY = posArray3[i][1]
         newPos3 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),
                             (-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
-        projPosArray1.append(newPos3)
+        projPosArray3.append(newPos3)
 
 velupdated1 = 0.0
 velupdated2 = 0.0
@@ -216,20 +216,15 @@ arrayforplots1= np.transpose(posArray1)
 arrayforplots2=np.transpose(posArray2)
 arrayforplots3=np.transpose(posArray3)
 
-# plt.plot(arrayforplots1[0],arrayforplots1[1], label='sun size mass') #,arrayforplots1[2])
-# plt.plot(arrayforplots2[0],arrayforplots2[1], label='jup size mass') #,arrayforplots2[2])
-# plt.plot(arrayforplots3[0],arrayforplots3[1], label='smaller size mass')
+plt.plot(arrayforplots1[0],arrayforplots1[1], arrayforplots1[2], label='sun size mass') #,arrayforplots1[2])
+plt.plot(arrayforplots2[0],arrayforplots2[1], arrayforplots2[2], label='jup size mass') #,arrayforplots2[2])
+plt.plot(arrayforplots3[0],arrayforplots3[1], arrayforplots3[2], label='smaller size mass')
 #plt.legend()
 ## make arrays suitable for projection
 projPos()
 arrayforprojplots1 = np.transpose(projPosArray1)
 arrayforprojplots2 = np.transpose(projPosArray2)
 arrayforprojplots3 = np.transpose(projPosArray3)
-
-plt.plot(arrayforplots1[0],arrayforplots1[1])
-plt.plot(arrayforplots2[0],arrayforplots2[1])
-plt.plot(arrayforplots3[0],arrayforplots3[1])
-
 
 def plotInit():
     '''set up animation with initial conditions'''
@@ -258,10 +253,6 @@ ani = animation.FuncAnimation(fig, animate, frames=len(arrayforplots3[0]), blit=
 # #for the time being, we'll try and look at the 2d motion of our particles. this should be fine, because if they
 # #have no initial z offset or velocity, we shouldnt have any motion or acceleration in that dimension
 #
-# ax.plot(arrayforplots1[0],arrayforplots1[1],arrayforplots1[2])
-# ax.plot(arrayforplots2[0],arrayforplots2[1],arrayforplots2[2])
-# ax.plot(arrayforplots3[0],arrayforplots3[1],arrayforplots3[2])
-
 plt.xlim(-1500.0,1500.0)
 plt.ylim(-1500.0,1500.0)
 plt.show()
@@ -269,6 +260,12 @@ plt.show()
 #plt.plot(np.arange(0,maxTime,dt),energyvals)
 #plt.show()
 
+figp = plt.figure()
+axp=figp.add_subplot(111, projection='3d')
+axp.plot(arrayforprojplots1[0],arrayforprojplots1[1],arrayforprojplots1[2])
+axp.plot(arrayforprojplots2[0],arrayforprojplots2[1],arrayforprojplots2[2])
+axp.plot(arrayforprojplots3[0],arrayforprojplots3[1],arrayforprojplots3[2])
+plt.show()
 
 #-------------------------------------------------------------------------------------------------------------
 #--------------------------------------SPECTRAL LINE BS-------------------------------------------------------
@@ -283,10 +280,7 @@ def gaussianprofile(velpos,centvel,maxflux,width):
     return norm*np.exp(-((velpos-centvel)**2.) / (2.*width**2.))
 
 velvals=np.arange(0,500,1.0)
-
-plt.plot(np.arange(0,maxTime,0.1),energyvals)
+plt.plot(velvals,gaussianprofile(velvals,20.0,1.0,5.0))
 plt.show()
-ax.plot3D(arrayforprojplots1[0],arrayforprojplots1[1])
-ax.plot3D(arrayforprojplots2[0],arrayforprojplots2[1])
-ax.plot3D(arrayforprojplots3[0],arrayforprojplots3[1])
-plt.show()
+# plt.plot(np.arange(0,maxTime,0.1),energyvals)
+# plt.show()
