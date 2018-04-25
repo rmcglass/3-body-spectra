@@ -161,6 +161,25 @@ def leapfrogtwobody(x1updated,x2updated):
         posArray2.append(x2updated)
 
 #leapfrog(x1updated,x2updated,x3updated)
+
+#----------------- STEROGRAPHIC PROJECTION -----------------#
+
+leapfrog(x1updated,x2updated,x3updated,[1,0,0])
+
+arrayforplots1= np.transpose(posArray1)
+arrayforplots2=np.transpose(posArray2)
+arrayforplots3=np.transpose(posArray3)
+
+plt.plot(arrayforplots1[0],arrayforplots1[1])
+plt.plot(arrayforplots2[0],arrayforplots2[1])
+plt.plot(arrayforplots3[0],arrayforplots3[1])
+plt.show()
+
+projPos()
+arrayforprojplots1 = np.transpose(projPosArray1)
+arrayforprojplots2 = np.transpose(projPosArray2)
+arrayforprojplots3 = np.transpose(projPosArray3)
+
 #--------------------RESTRICTED 3-BODY PROBLEM----------------------
 #now that we have leapfrog defined, we can just change the values of our variables between runs of our simulation.
 #we'll want to think about the restricted 3-body problem. in this case, we have two masses that are very, very massive - they will have stable orbits.
@@ -220,11 +239,7 @@ plt.plot(arrayforplots1[0],arrayforplots1[1], arrayforplots1[2], label='sun size
 plt.plot(arrayforplots2[0],arrayforplots2[1], arrayforplots2[2], label='jup size mass') #,arrayforplots2[2])
 plt.plot(arrayforplots3[0],arrayforplots3[1], arrayforplots3[2], label='smaller size mass')
 #plt.legend()
-## make arrays suitable for projection
-projPos()
-arrayforprojplots1 = np.transpose(projPosArray1)
-arrayforprojplots2 = np.transpose(projPosArray2)
-arrayforprojplots3 = np.transpose(projPosArray3)
+
 
 def plotInit():
     '''set up animation with initial conditions'''
@@ -242,9 +257,9 @@ def animate(i):
     lines = [line1,line2,line3]
     arrays = [arrayforplots1,arrayforplots2,arrayforplots3]
     for line, array in zip(lines,arrays):
-        line.set_data(array[0][:i],array[1][:i])
-        line.set_3d_properties(array[2][:i])
-    fig.canvas.draw()
+        line.set_data(array[0][i],array[1][i])
+        line.set_3d_properties(array[2][i])
+    #fig.canvas.draw()
     return lines
 
 ani = animation.FuncAnimation(fig, animate, frames=len(arrayforplots3[0]), blit=True, init_func=plotInit)
