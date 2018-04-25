@@ -18,6 +18,10 @@ vi_1 = np.array([p1,p2,p3])
 vi_2 = np.array([p1,p2,p3])
 vi_3 = np.array([-2*p1,-2*p2,-2*p3])
 #intitial positions
+projPosArray1=[]
+projPosArray2=[]
+projPosArray3=[]
+
 pos1 = np.array([-1.0,0.0,0.0])
 pos2 = np.array([1.0,0.0,0.0])
 pos3 = np.array([0.0,0.0,0.0])
@@ -54,7 +58,6 @@ def computeEnergy(vel1,vel2,vel3,pos1,pos2,pos3):
     energy = potentialterm + kineticterm
     return energy
 
-
 #initial half-step velocity
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2)+accel(pos1,pos3,m_3))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_1,)+accel(pos2,pos3,m_3))
@@ -80,6 +83,32 @@ def posNew(pos,dt,velupdated):
 
 def projectToLOS(vel,los):
     return np.dot(vel,los)
+
+# projects 2D coords onto 3D sphere w/ fixed radius
+def projPos():
+    for i in range(0,len(posArray1)-1):
+        oldX = posArray1[i][0]
+        oldY = posArray1[i][1]
+        newPos1 = np.array([2*oldX/(1+oldX**2+oldY**2),2*oldY/(1+oldX**2+oldY**2),(-1+oldX**2+oldY**2)/(1+oldX**2+oldY**2)])
+        projPosArray1.append(newPos1)
+    for i in range(0,len(posArray2)-1):
+        oldX = posArray2[i][0]
+        oldY = posArray2[i][1]
+        newPos2 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),(-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
+        projPosArray1.append(newPos2)
+    for i in range(0,len(posArray3)-1):
+        oldX = posArray3[i][0]
+        oldY = posArray3[i][1]
+        newPos3 = np.array([2 * oldX / (1 + oldX ** 2 + oldY ** 2), 2 * oldY / (1 + oldX ** 2 + oldY ** 2),
+                            (-1 + oldX ** 2 + oldY ** 2) / (1 + oldX ** 2 + oldY ** 2)])
+        projPosArray1.append(newPos3)
+
+velupdated1 = 0.0
+velupdated2 = 0.0
+velupdated3 = 0.0
+x1updated=pos1
+x2updated=pos2
+x3updated=pos3
 
 energyvals=[]
 def leapfrog(x1updated,x2updated,x3updated,losvec):
@@ -130,6 +159,7 @@ def leapfrogtwobody(x1updated,x2updated):
         x2updated = posNew(x2updated,dt,velupdated2)
         posArray1.append(x1updated)
         posArray2.append(x2updated)
+
 #leapfrog(x1updated,x2updated,x3updated)
 #--------------------RESTRICTED 3-BODY PROBLEM----------------------
 #now that we have leapfrog defined, we can just change the values of our variables between runs of our simulation.
@@ -190,6 +220,16 @@ arrayforplots3=np.transpose(posArray3)
 # plt.plot(arrayforplots2[0],arrayforplots2[1], label='jup size mass') #,arrayforplots2[2])
 # plt.plot(arrayforplots3[0],arrayforplots3[1], label='smaller size mass')
 #plt.legend()
+## make arrays suitable for projection
+projPos()
+arrayforprojplots1 = np.transpose(projPosArray1)
+arrayforprojplots2 = np.transpose(projPosArray2)
+arrayforprojplots3 = np.transpose(projPosArray3)
+
+plt.plot(arrayforplots1[0],arrayforplots1[1])
+plt.plot(arrayforplots2[0],arrayforplots2[1])
+plt.plot(arrayforplots3[0],arrayforplots3[1])
+
 
 def plotInit():
     '''set up animation with initial conditions'''
@@ -243,3 +283,10 @@ def gaussianprofile(velpos,centvel,maxflux,width):
     return norm*np.exp(-((velpos-centvel)**2.) / (2.*width**2.))
 
 velvals=np.arange(0,500,1.0)
+
+plt.plot(np.arange(0,maxTime,0.1),energyvals)
+plt.show()
+ax.plot3D(arrayforprojplots1[0],arrayforprojplots1[1])
+ax.plot3D(arrayforprojplots2[0],arrayforprojplots2[1])
+ax.plot3D(arrayforprojplots3[0],arrayforprojplots3[1])
+plt.show()
