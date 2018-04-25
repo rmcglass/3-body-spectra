@@ -230,3 +230,16 @@ plt.show()
 #plt.show()
 
 
+#-------------------------------------------------------------------------------------------------------------
+#--------------------------------------SPECTRAL LINE BS-------------------------------------------------------
+
+#first - define a method that returns a gaussian at the velocity of each of the parts of the system.
+#for now: this line will have a size proportional to the mass of the object.
+#(we'll plot this in log space, i guess)
+
+def gaussianprofile(velpos,centvel,maxflux,width):
+    #Set the normalisation
+    norm = maxflux/(width*np.sqrt(2.*np.pi))
+    return norm*np.exp(-((velpos-centvel)**2.) / (2.*width**2.))
+
+velvals=np.arange(0,500,1.0)
