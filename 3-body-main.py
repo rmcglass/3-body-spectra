@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 ##### initialize variables
-maxTime = 100000
+maxTime = 1000
 G=1.0
-dt = 10
+dt = 0.1
 # make asses
 m_1 = 1
 m_2 = 1
@@ -184,6 +184,9 @@ arrayforprojplots3 = np.transpose(projPosArray3)
 #now that we have leapfrog defined, we can just change the values of our variables between runs of our simulation.
 #we'll want to think about the restricted 3-body problem. in this case, we have two masses that are very, very massive - they will have stable orbits.
 #first, i'm going to test this - well try to do a two body version of our code!
+dt=10
+maxTime=1000
+
 m_1=1000.0
 m_2=1.0
 m_3=10**-6
@@ -219,7 +222,7 @@ plt.plot(np.arange(0,maxTime,dt),losVelArray2,label='less massive obj')
 plt.plot(np.arange(0,maxTime,dt),losVelArray3,label='tiny obj')
 plt.legend()
 
-plt.show()
+#plt.show()
 from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
 ax=fig.add_subplot(111, projection='3d')
@@ -302,5 +305,12 @@ def createSumGauss(velpos, cvels,fluxes,widths):
     width1,width2,width3 = widths
     retvals=[gaussianprofile(v,centvel1,flux1,width1)+gaussianprofile(v,centvel2,flux2,width2)+gaussianprofile(v,centvel3,flux3,width3) for v in velpos]
     return retvals
+
+velvals=np.arange(0,100,0.1)
+cvels=30,40,25
+fluxes=-0.1,1,10
+widths=1,10,5
+plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
+plt.show()
 # plt.plot(np.arange(0,maxTime,0.1),energyvals)
 # plt.show()
