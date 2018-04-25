@@ -57,7 +57,6 @@ def computeEnergy(vel1,vel2,vel3,pos1,pos2,pos3):
     energy = potentialterm + kineticterm
     return energy
 
-
 #initial half-step velocity
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2)+accel(pos1,pos3,m_3))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_1,)+accel(pos2,pos3,m_3))
@@ -83,6 +82,7 @@ def posNew(pos,dt,velupdated):
 
 def projectToLOS(vel,los):
     return np.dot(vel,los)
+
 # projects 2D coords onto 3D sphere w/ fixed radius
 def projPos():
     for i in range(0,len(posArray1)-1):
@@ -158,6 +158,7 @@ def leapfrogtwobody(x1updated,x2updated):
         x2updated = posNew(x2updated,dt,velupdated2)
         posArray1.append(x1updated)
         posArray2.append(x2updated)
+
 #leapfrog(x1updated,x2updated,x3updated)
 #--------------------RESTRICTED 3-BODY PROBLEM----------------------
 #now that we have leapfrog defined, we can just change the values of our variables between runs of our simulation.
