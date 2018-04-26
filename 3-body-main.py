@@ -153,8 +153,8 @@ def leapfrogtwobody(x1updated,x2updated):
         else:
             velupdated1 = velTwoBody(velupdated1,dt,x1updated,x2updated,m_2)
             velupdated2 = velTwoBody(velupdated2,dt,x2updated,x1updated,m_1)
-        #updatedenergy = computeEnergy(velupdated1, velupdated2, velupdated3, x1updated, x2updated, x3updated)
-        #energyvals.append(updatedenergy)
+        # updatedenergy = computeEnergy(velupdated1, velupdated2, velupdated3, x1updated, x2updated, x3updated)
+        # energyvals.append(updatedenergy)
         x1updated = posNew(x1updated,dt,velupdated1)
         x2updated = posNew(x2updated,dt,velupdated2)
         posArray1.append(x1updated)
@@ -173,6 +173,9 @@ arrayforplots3=np.transpose(posArray3)
 plt.plot(arrayforplots1[0],arrayforplots1[1])
 plt.plot(arrayforplots2[0],arrayforplots2[1])
 plt.plot(arrayforplots3[0],arrayforplots3[1])
+plt.show()
+
+plt.plot(np.arange(0,maxTime,dt),energyvals)
 plt.show()
 
 projPos()
@@ -199,6 +202,7 @@ posArray3=[]
 losVelArray1=[]
 losVelArray2=[]
 losVelArray3=[]
+energyvals=[]
 
 vi_1 = np.array([0,-0.001,0])
 vi_2 = np.array([0,0.999,-0.001])
@@ -213,9 +217,22 @@ pos3 = np.array([500.0,1.0,0.0])
 
 los=[1,0,0]
 leapfrog(pos1,pos2,pos3,los)
+
+
+plt.plot(np.arange(0,maxTime,dt),energyvals)
+plt.show()
 # -----------------------------------------------------------------
 # -------------- PLOTS AND ANIMATIONS BELOW------------------------
 # -----------------------------------------------------------------
+
+figp = plt.figure()
+axp=figp.add_subplot(111, projection='3d')
+axp.plot(arrayforprojplots1[0],arrayforprojplots1[1],arrayforprojplots1[2])
+axp.plot(arrayforprojplots2[0],arrayforprojplots2[1],arrayforprojplots2[2])
+axp.plot(arrayforprojplots3[0],arrayforprojplots3[1],arrayforprojplots3[2])
+plt.show()
+
+
 
 plt.plot(np.arange(0,maxTime,dt),losVelArray1,label='massive obj')
 plt.plot(np.arange(0,maxTime,dt),losVelArray2,label='less massive obj')
@@ -275,15 +292,8 @@ plt.xlim(-1500.0,1500.0)
 plt.ylim(-1500.0,1500.0)
 plt.show()
 
-#plt.plot(np.arange(0,maxTime,dt),energyvals)
-#plt.show()
 
-figp = plt.figure()
-axp=figp.add_subplot(111, projection='3d')
-axp.plot(arrayforprojplots1[0],arrayforprojplots1[1],arrayforprojplots1[2])
-axp.plot(arrayforprojplots2[0],arrayforprojplots2[1],arrayforprojplots2[2])
-axp.plot(arrayforprojplots3[0],arrayforprojplots3[1],arrayforprojplots3[2])
-plt.show()
+
 
 #-------------------------------------------------------------------------------------------------------------
 #--------------------------------------SPECTRAL LINE BS-------------------------------------------------------
@@ -317,10 +327,11 @@ plt.show()
 
 #-------------------------------------------------------------------------------------------------------------
 #----------------------------------------BLACK BODY FUNCTION STUFF--------------------------------------------
-def blackBody(wav, temp):
+def blackBody(wav, temp, vel):
     h = 6.626e-34
     c = 3.0e+8
     k = 1.38e-23
+    wav = wav * (1 + vel / c)
     a = 2*h*c**2/(wav**5)
     b = h*c/(wav*k*temp)
     return a/(np.exp(b)-1)
@@ -329,16 +340,15 @@ def blackBody(wav, temp):
 wavelengths = np.arange(1e-9, 3e-6, 1e-9)
 
 # intensity at 4000K, 5000K, 6000K, 7000K
-star4000 = blackBody(wavelengths, 4000.)
-star5000 = blackBody(wavelengths, 5000.)
-star6000 = blackBody(wavelengths, 6000.)
-star7000 = blackBody(wavelengths, 7000.)
+star1 = blackBody(wavelengths, 4000., losVelArray1)
+star2 = blackBody(wavelengths, 4000., losVelArray2)
+star3 = blackBody(wavelengths, 4000., losVelArray3)
 
-plt.plot(wavelengths*1e9, star4000, 'r-')
+
+plt.plot(wavelengths*1e9, star1, 'r-')
 # plot intensity4000 versus wavelength in nm as a red line
-plt.plot(wavelengths*1e9, star5000, 'g-') # 5000K green line
-plt.plot(wavelengths*1e9, star6000, 'b-') # 6000K blue line
-plt.plot(wavelengths*1e9, star7000, 'k-') # 7000K black line
+plt.plot(wavelengths*1e9, star2, 'g-') # 5000K green line
+plt.plot(wavelengths*1e9, star3, 'b-') # 6000K blue line
 
 # show the plot
 plt.show()
