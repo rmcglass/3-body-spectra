@@ -314,3 +314,31 @@ plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
 plt.show()
 # plt.plot(np.arange(0,maxTime,0.1),energyvals)
 # plt.show()
+
+#-------------------------------------------------------------------------------------------------------------
+#----------------------------------------BLACK BODY FUNCTION STUFF--------------------------------------------
+def blackBody(wav, temp):
+    h = 6.626e-34
+    c = 3.0e+8
+    k = 1.38e-23
+    a = 2*h*c**2/(wav**5)
+    b = h*c/(wav*k*temp)
+    return a/(np.exp(b)-1)
+#def bbShift:
+    #shifts blackbody spectrum based on velocity
+wavelengths = np.arange(1e-9, 3e-6, 1e-9)
+
+# intensity at 4000K, 5000K, 6000K, 7000K
+star4000 = blackBody(wavelengths, 4000.)
+star5000 = blackBody(wavelengths, 5000.)
+star6000 = blackBody(wavelengths, 6000.)
+star7000 = blackBody(wavelengths, 7000.)
+
+plt.plot(wavelengths*1e9, star4000, 'r-')
+# plot intensity4000 versus wavelength in nm as a red line
+plt.plot(wavelengths*1e9, star5000, 'g-') # 5000K green line
+plt.plot(wavelengths*1e9, star6000, 'b-') # 6000K blue line
+plt.plot(wavelengths*1e9, star7000, 'k-') # 7000K black line
+
+# show the plot
+plt.show()
