@@ -340,9 +340,9 @@ def blackBody(wav, temp, vel):
 wavelengths = np.arange(1e-9, 3e-6, 1e-9)
 
 # intensity at 4000K, 5000K, 6000K, 7000K
-star1 = blackBody(wavelengths, 4000., losVelArray1)
-star2 = blackBody(wavelengths, 4000., losVelArray2)
-star3 = blackBody(wavelengths, 4000., losVelArray3)
+star1 = [blackBody(wavelengths, 4000., v) for v in losVelArray1]
+star2 = [blackBody(wavelengths, 4000., v) for v in losVelArray2]
+star3 = [blackBody(wavelengths, 4000., v) for v in losVelArray3]
 
 
 plt.plot(wavelengths*1e9, star1, 'r-')
