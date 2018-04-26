@@ -186,9 +186,9 @@ arrayforprojplots3 = np.transpose(projPosArray3)
 #first, i'm going to test this - well try to do a two body version of our code!
 dt=10
 maxTime=100000
-
+energyvals=[]
 m_1=1000.0
-m_2=1.0
+m_2=10.0
 m_3=10**-6
 #m_3 will have no initial velocity
 #we also have to reinitialize our position arrays and our initial velocities
@@ -200,23 +200,22 @@ losVelArray1=[]
 losVelArray2=[]
 losVelArray3=[]
 
-vi_1 = np.array([0,-0.001,0])
-vi_2 = np.array([0,0.999,-0.001])
-vi_3 = np.array([0,0.0,0.0])
+vi_1 = np.array([0,-0.1,0])
+vi_2 = np.array([0,0.9,0.0])
+vi_3 = np.array([0,0.0,0.3])
 
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_2))
 
-pos1 = np.array([0.0,0.0,0.0])
-pos2 = np.array([1000.0,0.0,0.0])
-pos3 = np.array([500.0,1.0,0.0])
+pos1 = np.array([0.0,0.0,50.0])
+pos2 = np.array([1000.0,0.0,50.0])
+pos3 = np.array([500.0,1.0,50.0])
 
 los=[1,0,0]
 leapfrog(pos1,pos2,pos3,los)
 # -----------------------------------------------------------------
 # -------------- PLOTS AND ANIMATIONS BELOW------------------------
 # -----------------------------------------------------------------
-
 plt.plot(np.arange(0,maxTime,dt),losVelArray1,label='massive obj')
 plt.plot(np.arange(0,maxTime,dt),losVelArray2,label='less massive obj')
 plt.plot(np.arange(0,maxTime,dt),losVelArray3,label='tiny obj')
@@ -241,7 +240,7 @@ arrayforplots3=np.transpose(posArray3)
 plt.plot(arrayforplots1[0],arrayforplots1[1], arrayforplots1[2], label='sun size mass') #,arrayforplots1[2])
 plt.plot(arrayforplots2[0],arrayforplots2[1], arrayforplots2[2], label='jup size mass') #,arrayforplots2[2])
 plt.plot(arrayforplots3[0],arrayforplots3[1], arrayforplots3[2], label='smaller size mass')
-#plt.legend()
+plt.legend()
 
 
 def plotInit():
@@ -278,12 +277,12 @@ plt.show()
 #plt.plot(np.arange(0,maxTime,dt),energyvals)
 #plt.show()
 
-figp = plt.figure()
-axp=figp.add_subplot(111, projection='3d')
-axp.plot(arrayforprojplots1[0],arrayforprojplots1[1],arrayforprojplots1[2])
-axp.plot(arrayforprojplots2[0],arrayforprojplots2[1],arrayforprojplots2[2])
-axp.plot(arrayforprojplots3[0],arrayforprojplots3[1],arrayforprojplots3[2])
-plt.show()
+# figp = plt.figure()
+# axp=figp.add_subplot(111, projection='3d')
+# axp.plot(arrayforprojplots1[0],arrayforprojplots1[1],arrayforprojplots1[2])
+# axp.plot(arrayforprojplots2[0],arrayforprojplots2[1],arrayforprojplots2[2])
+# axp.plot(arrayforprojplots3[0],arrayforprojplots3[1],arrayforprojplots3[2])
+# plt.show()
 
 #-------------------------------------------------------------------------------------------------------------
 #--------------------------------------SPECTRAL LINE BS-------------------------------------------------------
@@ -310,7 +309,7 @@ velvals=np.arange(0,100,0.1)
 cvels=30,40,25
 fluxes=-0.1,1,10
 widths=1,10,5
-plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
+#plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
+#plt.show()
+plt.plot(np.arange(0,maxTime,dt),energyvals)
 plt.show()
-# plt.plot(np.arange(0,maxTime,0.1),energyvals)
-# plt.show()
