@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 ##### initialize variables
-maxTime = 100
-G=1.0
+maxTime = 50
+G=1
 dt = 0.1
 # make asses
 m_1 = 1
@@ -25,6 +25,7 @@ projPosArray3=[]
 pos1 = np.array([-1.0,0.0,0.0])
 pos2 = np.array([1.0,0.0,0.0])
 pos3 = np.array([0.0,0.0,0.0])
+
 # position arrays
 posArray1 = []
 posArray2 = []
@@ -183,15 +184,138 @@ arrayforprojplots1 = np.transpose(projPosArray1)
 arrayforprojplots2 = np.transpose(projPosArray2)
 arrayforprojplots3 = np.transpose(projPosArray3)
 
+#-------------------------------------------------------------------------------------------------------------
+#----------------------------------------BLACK BODY FUNCTION STUFF--------------------------------------------
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=10, metadata=dict(artist='Me'), bitrate=1800)
+def blackBody(wav, temp, vel):
+    h = 6.626e-34
+    c = 3.0e+8
+    k = 1.38e-23
+    wav = wav * (1 + vel*10e7 / c)
+    a = 2*h*c**2/(wav**5)
+    b = h*c/(wav*k*temp)
+    return a/(np.exp(b)-1)
+
+#def bbShift:
+    #shifts blackbody spectrum based on velocity
+wavelengths = np.arange(1e-9, 3e-6, 1e-9)
+fig = plt.figure()
+ax=fig.add_subplot(111)
+# intensity at 4000K, 5000K, 6000K, 7000K
+star1 = [blackBody(wavelengths, 4000., v) for v in losVelArray1]
+star2 = [blackBody(wavelengths, 4000., v) for v in losVelArray2]
+star3 = [blackBody(wavelengths, 4000., v) for v in losVelArray3]
+sumstar = [blackBody(wavelengths, 4000., v1)+blackBody(wavelengths, 4000., v2)+blackBody(wavelengths, 4000., v3) for v1,v2,v3 in zip(losVelArray1,losVelArray2,losVelArray3)]
+
+
+# plt.plot(wavelengths*1e9, star1[0])
+plt.plot(wavelengths*1e9, star1[0], 'w-')
+# # plot intensity4000 versus wavelength in nm as a red line
+# plt.plot(wavelengths*1e9, star2, 'g-') # 5000K green line
+# plt.plot(wavelengths*1e9, star3, 'b-') # 6000K blue line
+
+line1, = ax.plot([], [], 'r-', lw=2)
+line2, = ax.plot([], [], 'g-', lw=2)
+line3, = ax.plot([], [], 'b-', lw=2)
+line4, = ax.plot([], [], 'p-', lw=2)
+def bbplotInit():
+    '''set up animation with initial conditions'''
+    line1.set_data(wavelengths*1e9, star1[0])
+    line2.set_data(wavelengths*1e9, star2[0])
+    line3.set_data(wavelengths*1e9, star3[0])
+    line4.set_data(wavelengths*1e9, sumstar[0])
+    lines = [line1,line2,line3,line4]
+    return lines
+
+def bbanimate(i):
+    '''step animation'''
+    lines = [line1,line2,line3, line4]
+    arrays = [star1,star2, star3, sumstar]
+    for line, array in zip(lines,arrays):
+        line.set_data(wavelengths*1e9,array[i])
+    #fig.canvas.draw()
+    return lines
+bbani = animation.FuncAnimation(fig, bbanimate, frames=len(star1), blit=True, init_func=bbplotInit)
+
+# show the plot
+plt.ylim(0, 10e12)
+#bbani.save('planarbb.mp4',writer=writer)
+plt.show()
+
+
+fig = plt.figure()
+ax=fig.add_subplot(111)
+#first - define a method that returns a gaussian at the velocity of each of the parts of the system.
+#for now: this line will have a size proportional to the mass of the object.
+#(we'll plot this in log space, i guess)
+
+def gaussianprofile(velpos,centvel,maxflux,width):
+    #creates a gaussianprofile for each
+    #Set the normalisation
+    norm = maxflux/(width*np.sqrt(2.*np.pi))
+    return norm*np.exp(-((velpos-centvel)**2.) / (2.*width**2.))
+
+def createSumGauss(velpos, cvels,fluxes,widths):
+    #this method creates the triple gaussian profile of all three lines
+    centvel1,centvel2,centvel3 = cvels
+    flux1,flux2,flux3 = fluxes
+    width1,width2,width3 = widths
+    retvals=[gaussianprofile(v,centvel1,flux1,width1)+gaussianprofile(v,centvel2,flux2,width2)+gaussianprofile(v,centvel3,flux3,width3) for v in velpos]
+    return retvals
+
+velvals=np.arange(-10,10,0.01)
+cvels=30,40,25
+fluxes=-0.1,1,10
+widths=1,10,5
+#plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
+#plt.show()
+
+gauss1 = [gaussianprofile(velvals, v, 30, 0.5) for v in losVelArray1]
+gauss2 = [gaussianprofile(velvals, v, 30, 0.5) for v in losVelArray2]
+gauss3 = [gaussianprofile(velvals, v, 30, 0.5) for v in losVelArray3]
+sumgauss = [gaussianprofile(velvals, v1, 30, 0.5)+gaussianprofile(velvals, v2, 30, 0.5)+gaussianprofile(velvals, v3, 30, 0.5) for v1,v2,v3 in zip(losVelArray1,losVelArray2,losVelArray3)]
+
+plt.plot(velvals, sumgauss[0], 'w-')
+
+
+line1, = ax.plot([], [], 'r-', lw=2)
+line2, = ax.plot([], [], 'g-', lw=2)
+line3, = ax.plot([], [], 'b-', lw=2)
+line4, = ax.plot([], [], 'p-', lw=2)
+def gaussplotInit():
+    '''set up animation with initial conditions'''
+    line1.set_data(velvals, gauss1[0])
+    line2.set_data(velvals, gauss2[0])
+    line3.set_data(velvals, gauss3[0])
+    line4.set_data(velvals, sumgauss[0])
+    lines = [line1,line2,line3,line4]
+    return lines
+
+def gaussanimate(i):
+    '''step animation'''
+    lines = [line1,line2,line3,line4]
+    arrays = [gauss1,gauss2,gauss3,sumgauss]
+    for line, array in zip(lines,arrays):
+        line.set_data(velvals,array[i])
+    return lines
+
+gaussani = animation.FuncAnimation(fig, gaussanimate, frames=len(gauss1), blit=True, init_func=gaussplotInit)
+
+# show the plot
+plt.ylim(0,70.0)
+plt.xlim(-10,10)
+gaussani.save('planargauss.mp4',writer=writer)
+plt.show()
 #--------------------RESTRICTED 3-BODY PROBLEM----------------------
 #now that we have leapfrog defined, we can just change the values of our variables between runs of our simulation.
 #we'll want to think about the restricted 3-body problem. in this case, we have two masses that are very, very massive - they will have stable orbits.
 #first, i'm going to test this - well try to do a two body version of our code!
 dt=10
-maxTime=100000
+maxTime=20000
 energyvals=[]
 m_1=1000.0
-m_2=10.0
+m_2=1.0
 m_3=10**-6
 #m_3 will have no initial velocity
 #we also have to reinitialize our position arrays and our initial velocities
@@ -203,16 +327,20 @@ losVelArray1=[]
 losVelArray2=[]
 losVelArray3=[]
 
-vi_1 = np.array([0,-0.1,0])
-vi_2 = np.array([0,0.9,0.0])
-vi_3 = np.array([0,0.0,0.3])
+# vi_1 = np.array([0,-0.1,0])
+# vi_2 = np.array([0,0.9,0.0])
+# vi_3 = np.array([0,0.0,0.3])
+
+vi_1 = np.array([0,-0.001,0])
+vi_2 = np.array([0,0.999,-0.001])
+vi_3 = np.array([0,0.0,0.0])
 
 v05_1 = vi_1+0.05*(accel(pos1,pos2,m_2))
 v05_2 = vi_2+0.05*(accel(pos2,pos1,m_2))
 
-pos1 = np.array([0.0,0.0,50.0])
-pos2 = np.array([1000.0,0.0,50.0])
-pos3 = np.array([500.0,1.0,50.0])
+pos1 = np.array([0.0,0.0,0.0])
+pos2 = np.array([1000.0,0.0,0.0])
+pos3 = np.array([500.0,1.0,0.0])
 
 los=[1,0,0]
 leapfrog(pos1,pos2,pos3,los)
@@ -239,7 +367,6 @@ plt.plot(np.arange(0,maxTime,dt),losVelArray3,label='tiny obj')
 plt.legend()
 
 plt.show()
-from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
 ax=fig.add_subplot(111, projection='3d')
 line1, = ax.plot([], [], [], 'o-', lw=2)
@@ -292,11 +419,64 @@ plt.ylim(-1500.0,1500.0)
 plt.show()
 
 
+def blackBody(wav, temp, vel):
+    h = 6.626e-34
+    c = 3.0e+8
+    k = 1.38e-23
+    wav = wav * (1 + vel*10e7 / c)
+    a = 2*h*c**2/(wav**5)
+    b = h*c/(wav*k*temp)
+    return a/(np.exp(b)-1)
 
+#def bbShift:
+    #shifts blackbody spectrum based on velocity
+wavelengths = np.arange(1e-9, 3e-6, 1e-9)
+fig = plt.figure()
+ax=fig.add_subplot(111)
+# intensity at 4000K, 5000K, 6000K, 7000K
+star1 = [blackBody(wavelengths, 4000., v) for v in losVelArray1]
+star2 = [blackBody(wavelengths, 4000., v) for v in losVelArray2]
+star3 = [blackBody(wavelengths, 4000., v) for v in losVelArray3]
+sumstar = [blackBody(wavelengths, 4000., v1)+blackBody(wavelengths, 4000., v2)+blackBody(wavelengths, 4000., v3) for v1,v2,v3 in zip(losVelArray1,losVelArray2,losVelArray3)]
+
+
+# plt.plot(wavelengths*1e9, star1[0])
+plt.plot(wavelengths*1e9, star1[0], 'w-')
+# # plot intensity4000 versus wavelength in nm as a red line
+# plt.plot(wavelengths*1e9, star2, 'g-') # 5000K green line
+# plt.plot(wavelengths*1e9, star3, 'b-') # 6000K blue line
+
+line1, = ax.plot([], [], 'r-', lw=2)
+line2, = ax.plot([], [], 'g-', lw=2)
+line3, = ax.plot([], [], 'b-', lw=2)
+line4, = ax.plot([], [], 'p-', lw=2)
+def bbplotInit():
+    '''set up animation with initial conditions'''
+    line1.set_data(wavelengths*1e9, star1[0])
+    line2.set_data(wavelengths*1e9, star2[0])
+    line3.set_data(wavelengths*1e9, star3[0])
+    line4.set_data(wavelengths*1e9, sumstar[0])
+    lines = [line1,line2,line3, line4]
+    return lines
+
+def bbanimate(i):
+    '''step animation'''
+    lines = [line1,line2,line3, line4]
+    arrays = [star1,star2, star3, sumstar]
+    for line, array in zip(lines,arrays):
+        line.set_data(wavelengths*1e9,array[i])
+    return lines
+bbani = animation.FuncAnimation(fig, bbanimate, frames=len(star1), blit=True, init_func=bbplotInit)
+
+# show the plot
+plt.ylim(0, 10e12)
+#bbani.save('restrictedbb.mp4',writer=writer)
+plt.show()
 
 #-------------------------------------------------------------------------------------------------------------
 #--------------------------------------SPECTRAL LINE BS-------------------------------------------------------
-
+fig = plt.figure()
+ax=fig.add_subplot(111)
 #first - define a method that returns a gaussian at the velocity of each of the parts of the system.
 #for now: this line will have a size proportional to the mass of the object.
 #(we'll plot this in log space, i guess)
@@ -315,44 +495,46 @@ def createSumGauss(velpos, cvels,fluxes,widths):
     retvals=[gaussianprofile(v,centvel1,flux1,width1)+gaussianprofile(v,centvel2,flux2,width2)+gaussianprofile(v,centvel3,flux3,width3) for v in velpos]
     return retvals
 
-velvals=np.arange(0,100,0.1)
+velvals=np.arange(-10,10,0.01)
 cvels=30,40,25
 fluxes=-0.1,1,10
 widths=1,10,5
 #plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
 #plt.show()
-plt.plot(np.arange(0,maxTime,dt),energyvals)
-plt.show()
 
-plt.plot(velvals,createSumGauss(velvals,cvels,fluxes,widths))
-plt.show()
-# plt.plot(np.arange(0,maxTime,0.1),energyvals)
-# plt.show()
+gauss1 = [gaussianprofile(velvals, v, 100, 0.5) for v in losVelArray1]
+gauss2 = [gaussianprofile(velvals, v, 50, 0.5) for v in losVelArray2]
+gauss3 = [gaussianprofile(velvals, v, 10, 0.5) for v in losVelArray3]
+sumgauss = [gaussianprofile(velvals, v1, 100, 0.5)+gaussianprofile(velvals, v2, 50, 0.5)+gaussianprofile(velvals, v3, 10, 0.5) for v1,v2,v3 in zip(losVelArray1,losVelArray2,losVelArray3)]
 
-#-------------------------------------------------------------------------------------------------------------
-#----------------------------------------BLACK BODY FUNCTION STUFF--------------------------------------------
-def blackBody(wav, temp, vel):
-    h = 6.626e-34
-    c = 3.0e+8
-    k = 1.38e-23
-    wav = wav * (1 + vel / c)
-    a = 2*h*c**2/(wav**5)
-    b = h*c/(wav*k*temp)
-    return a/(np.exp(b)-1)
-#def bbShift:
-    #shifts blackbody spectrum based on velocity
-wavelengths = np.arange(1e-9, 3e-6, 1e-9)
-
-# intensity at 4000K, 5000K, 6000K, 7000K
-star1 = [blackBody(wavelengths, 4000., v) for v in losVelArray1]
-star2 = [blackBody(wavelengths, 4000., v) for v in losVelArray2]
-star3 = [blackBody(wavelengths, 4000., v) for v in losVelArray3]
+plt.plot(velvals, sumgauss[0], 'w-')
 
 
-plt.plot(wavelengths*1e9, star1, 'r-')
-# plot intensity4000 versus wavelength in nm as a red line
-plt.plot(wavelengths*1e9, star2, 'g-') # 5000K green line
-plt.plot(wavelengths*1e9, star3, 'b-') # 6000K blue line
+line1, = ax.plot([], [], 'r-', lw=2)
+line2, = ax.plot([], [], 'g-', lw=2)
+line3, = ax.plot([], [], 'b-', lw=2)
+line4, = ax.plot([], [], 'p-', lw=2)
+def gaussplotInit():
+    '''set up animation with initial conditions'''
+    line1.set_data(velvals, gauss1[0])
+    line2.set_data(velvals, gauss2[0])
+    line3.set_data(velvals, gauss3[0])
+    line4.set_data(velvals, sumgauss[0])
+    lines = [line1,line2,line3,line4]
+    return lines
+
+def gaussanimate(i):
+    '''step animation'''
+    lines = [line1,line2,line3,line4]
+    arrays = [gauss1,gauss2,gauss3,sumgauss]
+    for line, array in zip(lines,arrays):
+        line.set_data(velvals,array[i])
+    return lines
+
+gaussani = animation.FuncAnimation(fig, gaussanimate, frames=len(gauss1), blit=True, init_func=gaussplotInit)
 
 # show the plot
+plt.ylim(0,150.0)
+plt.xlim(-10,10)
+gaussani.save('restrictedgauss.mp4',writer=writer)
 plt.show()
